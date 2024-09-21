@@ -19,16 +19,18 @@ class Tree(object):
         assert isinstance(node, Tree)
         self.children.append(node)
 
-def bool_table1(x2, x4):
-    return x4 & ~x2
-
-def entropy(k_labels):
-    k_labels.pop("filter", None)
-    values = k_labels.values()
+def count_labels(values):
     total = 0
     for k in values:
         total += k
     
+    return total
+
+def entropy(k_labels):
+    k_labels.pop("filter", None)
+    values = k_labels.values()
+    total = count_labels(values)
+
     sum = 0
     for k in values:
         if k == 0:
@@ -38,18 +40,32 @@ def entropy(k_labels):
     
     return (-sum, total)
 
-def info_gain(total_entropy, attribute, labels):
+def ME(k_labels):
+    ...
+    
+def gini(k_labels):
+    k_labels.pop("filter", None)
+    values = k_labels.values()
+    total = count_labels(values)
+
+    sum = 1
+    for k in values:
+        sum -= (k / total) ** 2
+    
+    return (sum, total)
+
+def info_gain(purity, attribute, labels):
     subsets = create_subsets(attribute, labels)
 
-    gain = total_entropy[0]
-    total_labels = total_entropy[1]
+    gain = purity[0]
+    total_labels = purity[1]
     for subset in subsets:
         subset_labels = subsets[subset]
         temp_sub = subsets[subset]['filter']
 
         res = entropy(subset_labels)
         gain -= (res[1] / total_labels) * res[0]
-        
+
         subsets[subset]['filter'] = temp_sub
     
     return (gain, subsets)
@@ -101,16 +117,17 @@ def ID3(s, attributes, label):
     count = len(s)
 
 def main():
-    data = {
-        "x1": [0, 0, 0, 1, 0, 1, 0],
-        "x2": [0, 1, 0, 0, 1, 1, 1],
-        "x3": [1, 0, 1, 0, 1, 0, 0],
-        "x4": [0, 0, 1, 1, 0, 0, 0]
-    }
-    labels = {
-        "y": [0, 0, 1, 1, 0, 0, 0]
-    }
-    ID3(labels["y"], data, [0, 1])
+    # data = {
+    #     "x1": [0, 0, 0, 1, 0, 1, 0],
+    #     "x2": [0, 1, 0, 0, 1, 1, 1],
+    #     "x3": [1, 0, 1, 0, 1, 0, 0],
+    #     "x4": [0, 0, 1, 1, 0, 0, 0]
+    # }
+    # labels = {
+    #     "y": [0, 0, 1, 1, 0, 0, 0]
+    # }
+    # ID3(labels["y"], data, [0, 1])
+    print(ME({"P":15, "N": 5}))
 
 if __name__ == '__main__':
     main()
