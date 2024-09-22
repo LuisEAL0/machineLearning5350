@@ -31,11 +31,13 @@ def count_labels(values):
     return total
 
 def create_subsets(attr_name, attribute, labels, attr_set):
+    if type(attribute[0]) is type(int()):
+        return create_numeric_subset(attr_name, attribute, labels, attr_set[attr_name])
+
     subsets = {}
     index = 0
-
     for item in attribute:
-        if item not in subsets:
+        if item not in subsets and item is not int:
             subsets[item] = {"filter":[]}
             for label in labels:
                 subsets[item][label] = 0
@@ -54,6 +56,39 @@ def create_subsets(attr_name, attribute, labels, attr_set):
 
     return subsets
 
+def create_numeric_subset(attr_name, attribute, labels, attr_list):
+    med = median(attribute.copy())
+
+    subsets = {}
+    for binary in attr_list:
+        subsets[binary] = {"filter":[]}
+        for label in labels:
+            subsets[binary][label] = 0
+
+    index = 0
+    for number in attribute:
+        if number > med:
+            subsets["greater"]["filter"].append(index)
+            subsets["greater"][labels[index]] += 1
+        else:
+            subsets["less"]["filter"].append(index)
+            subsets["less"][labels[index]] += 1
+        index += 1
+    
+    for sub in subsets:
+        if sub not in attr_list:
+            index -= len(subsets[sub]["filter"])
+    
+    for sub in subsets:
+        if sub in attr_list:
+            subsets[sub]["proportion"] = len(subsets[sub]["filter"]) / index
+    
+    return subsets
+
+def median(unsorted_list):
+    unsorted_list.sort()
+    return int(unsorted_list[len(unsorted_list)//2])
+
 def create_label(labels):
     label_dict = {}
     for label in labels:
@@ -68,6 +103,8 @@ def entropy(k_labels):
     k_labels.pop("proportion", None)
     values = k_labels.values()
     total = count_labels(values)
+    if total == 0:
+        return(1, 0)
 
     sum = 0
     for k in values:
@@ -84,17 +121,25 @@ def ME(k_labels):
     values = k_labels.values()
     total = count_labels(values)
 
-    return (min(values) / total, total)
+    if total == 0:
+        return (0,0)
+    else:
+        return (min(values) / total, total)
     
 def gini(k_labels):
     k_labels.pop("filter", None)
     k_labels.pop("proportion", None)
     values = k_labels.values()
     total = count_labels(values)
+    if total == 0:
+        return (1,0)
 
     sum = 1
     for k in values:
-        sum -= (k / total) ** 2
+        if k == 0:
+            sum += 0
+        else:
+            sum -= (k / total) ** 2
     
     return (sum, total)
 

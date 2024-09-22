@@ -1,5 +1,17 @@
 import csv
+import math
 from decisionTree import *
+
+def median(unsorted_list):
+    unsorted_list.sort()
+    return int(unsorted_list[len(unsorted_list)//2])
+
+def numerics(attributes, bank_attributes):
+    median_dict = {}
+    for attr in bank_attributes:
+        if bank_attributes[attr] == "numeric":
+            median_dict[attr] = median(attributes[attr].copy())
+    return median_dict
 
 def read_csv_asdict(filepath):
     data_dict = {}
@@ -58,25 +70,93 @@ def test_car(data_dict, function):
         test_car.append(correct/total)
     
     return (train_car, test_car)
+
+def test_bank(data_dict, function):
+    labels = data_dict["label"]
+    data_dict.pop("label")
+    attributes = data_dict
+    bank_attributes = {
+    "age": "numeric",
+    "job": ["admin.", "unknown", "unemployed", "management", "housemaid", "entrepreneur", "student",
+            "blue-collar", "self-employed", "retired", "technician", "services"],
+    "marital": ["married", "divorced", "single"],
+    "education": ["unknown", "secondary", "primary", "tertiary"],
+    "default": ["yes", "no"],
+    "balance": "numeric",
+    "housing": ["yes", "no"],
+    "loan": ["yes", "no"],
+    "contact": ["unknown", "telephone", "cellular"],
+    "day": "numeric",
+    "month": ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"],
+    "duration": "numeric",
+    "campaign": "numeric",
+    "pdays": "numeric",
+    "previous": "numeric",
+    "poutcome": ["unknown", "other", "failure", "success"]
+    }
+    bank_labels = ["yes", "no"]
+
+    median_dict = numerics(attributes, bank_attributes)
+    for attr in bank_attributes:
+        if bank_attributes[attr] == "numeric":
+            bank_attributes[attr] = ["less", "greater"]
+            for i in range(len(attributes[attr])):
+                attributes[attr][i] = int(attributes[attr][i])
+    
+    test_bank = []
+    train_bank = []
+    total = len(labels)
+
+    for tree_size in range(1,17):
+        tree = ID3(labels, attributes, bank_attributes, 0, tree_size, function)
+
+        correct = 0
+        train_data = read_csv_line("../DecisionTree/bankData/train.csv")
+        for row in train_data:
+            for item in row:
+                if item in median_dict.keys():
+                    row[item] = int(row[item])
+            
+            if row["label"] == predict(row, tree, bank_labels, median_dict):
+                correct += 1
+        train_bank.append(correct/total)
+
+        correct = 0
+        test_data = read_csv_line("../DecisionTree/bankData/test.csv")
+        for row in test_data:
+            for item in row:
+                if item in median_dict.keys():
+                    row[item] = int(row[item])
+
+            if row["label"] == predict(row, tree, bank_labels, median_dict):
+                correct += 1
+        test_bank.append(correct/total)
+    
+    return (train_bank, test_bank)
              
-def predict(example, tree, labels):
+def predict(example, tree, labels, median={}):
     if tree.branch:
-        return predict(example, tree.children[0], labels)
+        return predict(example, tree.children[0], labels, median)
     if tree.name in labels:
         return tree.name
     
     at_needed = tree.name 
     example_v = example[at_needed]
 
+    if type(example_v) is type(int()):
+        if example_v > median[at_needed]:
+            return predict(example, tree.children[1], labels, median)
+        else:
+            return predict(example, tree.children[0], labels, median)
+
     for c in tree.children:
         if c.name == example_v:
-            return predict(example, c, labels)
+            return predict(example, c, labels, median)
 
-def main():
-    gains = [entropy, gini, ME]
-    res0 = test_car(read_csv_asdict("../DecisionTree/carData/train.csv"), gains[0])
-    res1 = test_car(read_csv_asdict("../DecisionTree/carData/train.csv"), gains[1])
-    res2 = test_car(read_csv_asdict("../DecisionTree/carData/train.csv"), gains[2])
+def run_tests(gains, filepath, func):
+    res0 = func(read_csv_asdict(filepath), gains[0])
+    res1 = func(read_csv_asdict(filepath), gains[1])
+    res2 = func(read_csv_asdict(filepath), gains[2])
     
     train0, train1, train2 = res0[0],res1[0],res2[0]
     test0, test1, test2 = res0[1],res1[1],res2[1]
@@ -90,6 +170,11 @@ def main():
     print(f"{"SIZE":{" "}{"^"}{4}} | {"ENTROPY":{" "}{"^"}{9}} | {"GINI":{" "}{"^"}{8}} | {"ME":{" "}{"^"}{8}}|")
     for i in range(len(test0)):
         print(f"{i+1:{" "}{">"}{4}} | {(test0[i]):{" "}{"^"}{9}.3f} | {(test1[i]):{" "}{"^"}{8}.3f} | {(test2[i]):{" "}{"^"}{7}.3f} |")
+
+def main():
+    gains = [entropy, gini, ME]
+    #run_tests(gains, "../DecisionTree/carData/train.csv", test_car)
+    run_tests(gains, "../DecisionTree/bankData/train.csv", test_bank)
 
 if __name__ == '__main__':
     main()
