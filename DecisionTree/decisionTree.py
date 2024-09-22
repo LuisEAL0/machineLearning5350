@@ -5,14 +5,17 @@ import pprint
 # https://stackoverflow.com/a/28015122
 class Tree(object):
     "Generic tree node."
-    def __init__(self, name='root', children=None):
+    def __init__(self, name='root', level=0,children=None):
         self.name = name
+        self.level = level
         self.children = []
         if children is not None:
             for child in children:
                 self.add_child(child)
     def __repr__(self):
         return self.name
+    def __depth__(self):
+        return self.level
     def add_child(self, node):
         assert isinstance(node, Tree)
         self.children.append(node)
@@ -148,7 +151,7 @@ def split(attributes, labels, a_s, func=entropy):
     print()
     return (best_attribute, subsets_attribute)
 
-def ID3(s, attributes, attribute_set, call, func=entropy):
+def ID3(s, attributes, attribute_set, call, max_tree_depth, func=entropy, depth=0):
     print(f'Call {call}')
     print(f'Labels {pprint.pformat(s)}')
     pprint.pprint(attributes)
@@ -162,30 +165,32 @@ def ID3(s, attributes, attribute_set, call, func=entropy):
     for l in labels:
         if labels[l] == count:
             print(f"Pick label {l}\n")
-            return Tree(l)
+            return Tree(l, depth)
         if labels[l] > max_label:
             common_label = l
             max_label = labels[l]
     if len(attributes) == 0:
         print(f"Pick label {common_label}\n")
-        return Tree(common_label)
-    
+        return Tree(common_label, depth)
+    if depth >= max_tree_depth:
+        return Tree(common_label, depth)
+
     #Else
     A = split(attributes, s, attribute_set, func)
     name = A[0]
     A_subset = A[1]
 
-    root = Tree(name)
+    root = Tree(name, depth)
     
     for pv in attribute_set[name]:
         if pv not in A_subset:
             A_subset[pv] = {"filter":[]}
 
     for v in A_subset:
-        v_node = Tree(v)
+        v_node = Tree(v, depth + 1)
         root.add_child(v_node)
         print("Current subtree looks like:")
-        tree_traversal(root, 0, 0)
+        tree_traversal(root, 0)
         print()
         nl = []
         na = {}
@@ -199,28 +204,28 @@ def ID3(s, attributes, attribute_set, call, func=entropy):
                 na[attr].append(attributes[attr][i])
         for i in filter:
             nl.append(s[i])
-        
+
         if len(nl) == 0:
-            v_node.add_child(Tree(common_label))
+            v_node.add_child(Tree(common_label, v_node.level))
         else:
-            v_node.add_child(ID3(nl, na, attribute_set,call + 1,func))
+            v_node.add_child(ID3(nl, na, attribute_set,call + 1,max_tree_depth,func, v_node.level))
 
     return root
 
-def tree_traversal(node, ident, level):
-    print(f'{str(level) + ":" + str(node.__repr__()):>{ident}}')
+def tree_traversal(node, ident):
+    print(f'{str(node.level) + ":" + str(node.name):>{ident}}')
     for c in node.children:
-        tree_traversal(c, ident + 3, level + 1)
+        tree_traversal(c, ident + 3)
 
 def main():
-    l = [1,0,0,1,1,1,0,1,0,1,1,1,1,1,0]
-    a = {"Outlook":["Missing","S", "S", "O", "R", "R", "R", "O", "S", "S", "R", "S", "O", "O", "R"],
-         "Temperature":["M","H", "H", "H", "M", "C", "C", "C", "M", "C", "M", "M", "M", "H", "M"],
-         "Humidity":["N","H", "H", "H", "H", "N", "N", "N", "H", "N", "N", "N", "H", "N", "H"],
-         "Wind":["W","W", "S", "W", "W", "W", "S", "S", "W", "W", "W", "S", "S", "W", "S"]}
-    a_s = {"Outlook": ["S", "O", "R"], "Temperature": ["H", "M", "C"], "Humidity":["H", "N", "L"], "Wind":["W", "S"]}
-    a= ID3(l, a, a_s, 0)
-    print("Final tree looks like:")
-    tree_traversal(a, 0, 0)
+    # l = [1,0,0,1,1,1,0,1,0,1,1,1,1,1,0]
+    # a = {"Outlook":["Missing","Missing", "S", "O", "R", "R", "R", "O", "S", "S", "R", "S", "O", "O", "R"],
+    #      "Temperature":["M","H", "H", "H", "M", "C", "C", "C", "M", "C", "M", "M", "M", "H", "M"],
+    #      "Humidity":["N","H", "H", "H", "H", "N", "N", "N", "H", "N", "N", "N", "H", "N", "H"],
+    #      "Wind":["W","W", "S", "W", "W", "W", "S", "S", "W", "W", "W", "S", "S", "W", "S"]}
+    # a_s = {"Outlook": ["S", "O", "R"], "Temperature": ["H", "M", "C"], "Humidity":["H", "N", "L"], "Wind":["W", "S"]}
+    # a= ID3(l, a, a_s, 0, 2)
+    # print("Final tree looks like:")
+    # tree_traversal(a, 0)
 if __name__ == '__main__':
     main()
