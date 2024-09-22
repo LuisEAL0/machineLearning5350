@@ -5,9 +5,10 @@ import pprint
 # https://stackoverflow.com/a/28015122
 class Tree(object):
     "Generic tree node."
-    def __init__(self, name='root', level=0,children=None):
+    def __init__(self, name='root', level=0, branch=False,children=None):
         self.name = name
         self.level = level
+        self.branch = branch
         self.children = []
         if children is not None:
             for child in children:
@@ -16,6 +17,8 @@ class Tree(object):
         return self.name
     def __depth__(self):
         return self.level
+    def __branch__(self):
+        return self.branch
     def add_child(self, node):
         assert isinstance(node, Tree)
         self.children.append(node)
@@ -165,15 +168,15 @@ def ID3(s, attributes, attribute_set, call, max_tree_depth, func=entropy, depth=
     for l in labels:
         if labels[l] == count:
             # print(f"Pick label {l}\n")
-            return Tree(l, depth)
+            return Tree(l, depth, False)
         if labels[l] > max_label:
             common_label = l
             max_label = labels[l]
     if len(attributes) == 0:
         # print(f"Pick label {common_label}\n")
-        return Tree(common_label, depth)
+        return Tree(common_label, depth, False)
     if depth >= max_tree_depth:
-        return Tree(common_label, depth)
+        return Tree(common_label, depth, False)
 
     #Else
     A = split(attributes, s, attribute_set, func)
@@ -187,7 +190,7 @@ def ID3(s, attributes, attribute_set, call, max_tree_depth, func=entropy, depth=
             A_subset[pv] = {"filter":[]}
 
     for v in A_subset:
-        v_node = Tree(v, depth + 1)
+        v_node = Tree(v, depth + 1, True)
         root.add_child(v_node)
         # print("Current subtree looks like:")
         # tree_traversal(root, 0)
@@ -206,7 +209,7 @@ def ID3(s, attributes, attribute_set, call, max_tree_depth, func=entropy, depth=
             nl.append(s[i])
 
         if len(nl) == 0:
-            v_node.add_child(Tree(common_label, v_node.level))
+            v_node.add_child(Tree(common_label, v_node.level, False))
         else:
             v_node.add_child(ID3(nl, na, attribute_set,call + 1,max_tree_depth,func, v_node.level))
 
