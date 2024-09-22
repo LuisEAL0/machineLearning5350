@@ -71,6 +71,39 @@ def test_car(data_dict, function):
     
     return (train_car, test_car)
 
+def most_common_label_replace(attributes, attribute_set):
+    count_dict = {}
+    for attr in attributes:
+        if attribute_set[attr] == "numeric" or ("unknown" not in attribute_set[attr]):
+            continue
+        if attr not in count_dict:
+            count_dict[attr] = {}
+            for v in attribute_set[attr]:
+                count_dict[attr][v] = 0
+        for i in attribute_set[attr]:
+            for v in attributes[attr]:
+                if v == i:
+                    count_dict[attr][i] += 1
+        attribute_set[attr].remove("unknown")
+    
+    for attr in attributes:
+        if attr not in count_dict:
+            continue
+        replace = largest(count_dict, attr)
+        for i in range(len(attributes[attr])):
+            if attributes[attr][i] == "unknown":
+                attributes[attr][i] = replace
+
+def largest(count_dict, attr):        
+    largest_val = ''
+    max_val = -inf
+
+    for value in count_dict[attr]:
+        if value != "unknown" and count_dict[attr][value] > max_val:
+            largest_val = value
+            max_val = count_dict[attr][value]
+    return largest_val
+
 def test_bank(data_dict, function):
     labels = data_dict["label"]
     data_dict.pop("label")
@@ -96,6 +129,7 @@ def test_bank(data_dict, function):
     }
     bank_labels = ["yes", "no"]
 
+    most_common_label_replace(attributes, bank_attributes)
     median_dict = numerics(attributes, bank_attributes)
     for attr in bank_attributes:
         if bank_attributes[attr] == "numeric":
@@ -166,10 +200,23 @@ def run_tests(gains, filepath, func):
     for i in range(len(train0)):
         print(f"{i+1:{" "}{">"}{4}} | {(train0[i]):{" "}{"^"}{9}.3f} | {(train1[i]):{" "}{"^"}{8}.3f} | {(train2[i]):{" "}{"^"}{7}.3f} |")
 
+    print(f"{"AVG":{" "}{">"}{4}} | {(avg(train0)):{" "}{"^"}{9}.3f} | {(avg(train1)):{" "}{"^"}{8}.3f} | {(avg(train2)):{" "}{"^"}{7}.3f} |")
+
     print(f"\nTESTING DATA")
     print(f"{"SIZE":{" "}{"^"}{4}} | {"ENTROPY":{" "}{"^"}{9}} | {"GINI":{" "}{"^"}{8}} | {"ME":{" "}{"^"}{8}}|")
     for i in range(len(test0)):
         print(f"{i+1:{" "}{">"}{4}} | {(test0[i]):{" "}{"^"}{9}.3f} | {(test1[i]):{" "}{"^"}{8}.3f} | {(test2[i]):{" "}{"^"}{7}.3f} |")
+    
+    print(f"{"AVG":{" "}{">"}{4}} | {(avg(test0)):{" "}{"^"}{9}.3f} | {(avg(test1)):{" "}{"^"}{8}.3f} | {(avg(test2)):{" "}{"^"}{7}.3f} |")
+
+def avg(list):
+    sum = 0
+    size = 0
+    for i in list:
+        sum += i
+        size += 1
+    
+    return sum / size
 
 def main():
     gains = [entropy, gini, ME]

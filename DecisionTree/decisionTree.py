@@ -104,7 +104,7 @@ def entropy(k_labels):
     values = k_labels.values()
     total = count_labels(values)
     if total == 0:
-        return(1, 0)
+        return(0, 0)
 
     sum = 0
     for k in values:
