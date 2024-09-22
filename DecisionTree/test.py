@@ -92,7 +92,7 @@ def most_common_label_replace(attributes, attribute_set):
             continue
         replace = largest(count_dict, attr)
         missing_values[attr] = replace
-
+        
     return missing_values
 
 def largest(count_dict, attr):        
@@ -201,18 +201,18 @@ def run_tests(gains, filepath, func):
     test0, test1, test2 = res0[1],res1[1],res2[1]
 
     print(f"TRAINING DATA")
-    print(f"{"SIZE":{" "}{"^"}{4}} | {"ENTROPY":{" "}{"^"}{9}} | {"GINI":{" "}{"^"}{8}} | {"ME":{" "}{"^"}{8}}|")
+    print(f"{'SIZE':{' '}{'^'}{4}} | {'ENTROPY':{' '}{'^'}{9}} | {'GINI':{' '}{'^'}{8}} | {'ME':{' '}{'^'}{8}}|")
     for i in range(len(train0)):
-        print(f"{i+1:{" "}{">"}{4}} | {(train0[i]):{" "}{"^"}{9}.3f} | {(train1[i]):{" "}{"^"}{8}.3f} | {(train2[i]):{" "}{"^"}{7}.3f} |")
+        print(f"{i+1:{' '}{'>'}{4}} | {(train0[i]):{' '}{'^'}{9}.3f} | {(train1[i]):{' '}{'^'}{8}.3f} | {(train2[i]):{' '}{'^'}{7}.3f} |")
 
-    print(f"{"AVG":{" "}{">"}{4}} | {(avg(train0)):{" "}{"^"}{9}.3f} | {(avg(train1)):{" "}{"^"}{8}.3f} | {(avg(train2)):{" "}{"^"}{7}.3f} |")
+    print(f"{'AVG':{' '}{'>'}{4}} | {(avg(train0)):{' '}{'^'}{9}.3f} | {(avg(train1)):{' '}{'^'}{8}.3f} | {(avg(train2)):{' '}{'^'}{7}.3f} |")
 
     print(f"\nTESTING DATA")
-    print(f"{"SIZE":{" "}{"^"}{4}} | {"ENTROPY":{" "}{"^"}{9}} | {"GINI":{" "}{"^"}{8}} | {"ME":{" "}{"^"}{8}}|")
+    print(f"{'SIZE':{' '}{'^'}{4}} | {'ENTROPY':{' '}{'^'}{9}} | {'GINI':{' '}{'^'}{8}} | {'ME':{' '}{'^'}{8}}|")
     for i in range(len(test0)):
-        print(f"{i+1:{" "}{">"}{4}} | {(test0[i]):{" "}{"^"}{9}.3f} | {(test1[i]):{" "}{"^"}{8}.3f} | {(test2[i]):{" "}{"^"}{7}.3f} |")
+        print(f"{i+1:{' '}{'>'}{4}} | {(test0[i]):{' '}{'^'}{9}.3f} | {(test1[i]):{' '}{'^'}{8}.3f} | {(test2[i]):{' '}{'^'}{7}.3f} |")
     
-    print(f"{"AVG":{" "}{">"}{4}} | {(avg(test0)):{" "}{"^"}{9}.3f} | {(avg(test1)):{" "}{"^"}{8}.3f} | {(avg(test2)):{" "}{"^"}{7}.3f} |")
+    print(f"{'AVG':{' '}{'>'}{4}} | {(avg(test0)):{' '}{'^'}{9}.3f} | {(avg(test1)):{' '}{'^'}{8}.3f} | {(avg(test2)):{' '}{'^'}{7}.3f} |")
 
 def avg(list):
     sum = 0
@@ -225,7 +225,9 @@ def avg(list):
 
 def main():
     gains = [entropy, gini, ME]
+    print("Running Decision Tree on carData...")
     run_tests(gains, "../DecisionTree/carData/train.csv", test_car)
+    print("\nRunning Decision Tree on bankData...")
     run_tests(gains, "../DecisionTree/bankData/train.csv", test_bank)
 
 if __name__ == '__main__':
