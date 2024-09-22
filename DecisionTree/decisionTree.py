@@ -215,18 +215,10 @@ def ID3(s, attributes, attribute_set, call, max_tree_depth, func=entropy, depth=
 def tree_traversal(node, ident):
     print(f'{str(node.level) + ":" + str(node.name):>{ident}}')
     for c in node.children:
-        tree_traversal(c, ident + 2)
+        tree_traversal(c, ident + 3)
 
 def main():
-    # l = [1,0,0,1,1,1,0,1,0,1,1,1,1,1,0]
-    # a = {"Outlook":["Missing","Missing", "S", "O", "R", "R", "R", "O", "S", "S", "R", "S", "O", "O", "R"],
-    #      "Temperature":["M","H", "H", "H", "M", "C", "C", "C", "M", "C", "M", "M", "M", "H", "M"],
-    #      "Humidity":["N","H", "H", "H", "H", "N", "N", "N", "H", "N", "N", "N", "H", "N", "H"],
-    #      "Wind":["W","W", "S", "W", "W", "W", "S", "S", "W", "W", "W", "S", "S", "W", "S"]}
-    # a_s = {"Outlook": ["S", "O", "R"], "Temperature": ["H", "M", "C"], "Humidity":["H", "N", "L"], "Wind":["W", "S"]}
-    # a= ID3(l, a, a_s, 0, 2)
-    # print("Final tree looks like:")
-    # tree_traversal(a, 0)
     ...
+        
 if __name__ == '__main__':
     main()
