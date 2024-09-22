@@ -1,0 +1,605 @@
+1.1
+Call 0
+Labels [0, 0, 1, 1, 0, 0, 0]
+{'x1': [0, 0, 0, 1, 0, 1, 0],
+ 'x2': [0, 1, 0, 0, 1, 1, 1],
+ 'x3': [1, 0, 1, 0, 1, 0, 0],
+ 'x4': [0, 0, 1, 1, 0, 0, 1]}
+
+The total purity of the system is: 0.863
+
+The gain for attribute x1 is 0.062
+The gain for attribute x2 is 0.470
+The gain for attribute x3 is 0.006
+The gain for attribute x4 is 0.470
+
+Split on x2 which has subsets of:
+{0: {0: 1, 1: 2, 'filter': [0, 2, 3]}, 1: {0: 4, 1: 0, 'filter': [1, 4, 5, 6]}}
+
+Current subtree looks like:
+0:x2
+
+Call 1
+Labels [0, 1, 1]
+{'x1': [0, 0, 1], 'x3': [1, 1, 0], 'x4': [0, 1, 1]}
+
+The total purity of the system is: 0.918
+
+The gain for attribute x1 is 0.252
+The gain for attribute x3 is 0.252
+The gain for attribute x4 is 0.918
+
+Split on x4 which has subsets of:
+{0: {0: 1, 1: 0, 'filter': [0]}, 1: {0: 0, 1: 2, 'filter': [1, 2]}}
+
+Current subtree looks like:
+0:x4
+
+Call 2
+Labels [0]
+{'x1': [0], 'x3': [1]}
+
+Pick label 0
+
+Current subtree looks like:
+0:x4
+1:0
+
+Call 2
+Labels [1, 1]
+{'x1': [0, 1], 'x3': [1, 0]}
+
+Pick label 1
+
+Current subtree looks like:
+0:x2
+1:x4
+   2:0
+   2:1
+
+Call 1
+Labels [0, 0, 0, 0]
+{'x1': [0, 0, 1, 0], 'x3': [0, 1, 0, 0], 'x4': [0, 0, 0, 1]}
+
+Pick label 0
+
+Final tree looks like:
+0:x2
+1:x4
+   2:0
+   2:1
+1:0
+
+1.2a --------------------------------------------------------------------------------------------------------------------------------------------
+Call 0
+Labels [0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0]
+{'Humidity': ['H',
+              'H',
+              'H',
+              'H',
+              'N',
+              'N',
+              'N',
+              'H',
+              'N',
+              'N',
+              'N',
+              'H',
+              'N',
+              'H'],
+ 'Outlook': ['S',
+             'S',
+             'O',
+             'R',
+             'R',
+             'R',
+             'O',
+             'S',
+             'S',
+             'R',
+             'S',
+             'O',
+             'O',
+             'R'],
+ 'Temperature': ['H',
+                 'H',
+                 'H',
+                 'M',
+                 'C',
+                 'C',
+                 'C',
+                 'M',
+                 'C',
+                 'M',
+                 'M',
+                 'M',
+                 'H',
+                 'M'],
+ 'Wind': ['W', 'S', 'W', 'W', 'W', 'S', 'S', 'W', 'W', 'W', 'S', 'S', 'W', 'S']}
+
+The total purity of the system is: 0.357
+
+The gain for attribute Outlook is 0.071
+The gain for attribute Temperature is 0.000
+The gain for attribute Humidity is 0.071
+The gain for attribute Wind is 0.000
+
+Split on Humidity which has subsets of:
+{'H': {0: 4, 1: 3, 'filter': [0, 1, 2, 3, 7, 11, 13]},
+ 'N': {0: 1, 1: 6, 'filter': [4, 5, 6, 8, 9, 10, 12]}}
+
+Current subtree looks like:
+0:Humidity
+1:H
+
+Call 1
+Labels [0, 0, 1, 1, 0, 1, 0]
+{'Outlook': ['S', 'S', 'O', 'R', 'S', 'O', 'R'],
+ 'Temperature': ['H', 'H', 'H', 'M', 'M', 'M', 'M'],
+ 'Wind': ['W', 'S', 'W', 'W', 'W', 'S', 'S']}
+
+The total purity of the system is: 0.429
+
+The gain for attribute Outlook is 0.286
+The gain for attribute Temperature is 0.000
+The gain for attribute Wind is 0.000
+
+Split on Outlook which has subsets of:
+{'O': {0: 0, 1: 2, 'filter': [2, 5]},
+ 'R': {0: 1, 1: 1, 'filter': [3, 6]},
+ 'S': {0: 3, 1: 0, 'filter': [0, 1, 4]}}
+
+Current subtree looks like:
+0:Outlook
+1:S
+
+Call 2
+Labels [0, 0, 0]
+{'Temperature': ['H', 'H', 'M'], 'Wind': ['W', 'S', 'W']}
+
+Pick label 0
+
+Current subtree looks like:
+0:Outlook
+1:S
+   2:0
+1:O
+
+Call 2
+Labels [1, 1]
+{'Temperature': ['H', 'M'], 'Wind': ['W', 'S']}
+
+Pick label 1
+
+Current subtree looks like:
+0:Outlook
+1:S
+   2:0
+1:O
+   2:1
+1:R
+
+Call 2
+Labels [1, 0]
+{'Temperature': ['M', 'M'], 'Wind': ['W', 'S']}
+
+The total purity of the system is: 0.500
+
+The gain for attribute Temperature is 0.000
+The gain for attribute Wind is 0.500
+
+Split on Wind which has subsets of:
+{'S': {0: 1, 1: 0, 'filter': [1]}, 'W': {0: 0, 1: 1, 'filter': [0]}}
+
+Current subtree looks like:
+0:Wind
+1:W
+
+Call 3
+Labels [1]
+{'Temperature': ['M']}
+
+Pick label 1
+
+Current subtree looks like:
+0:Wind
+1:W
+   2:1
+1:S
+
+Call 3
+Labels [0]
+{'Temperature': ['M']}
+
+Pick label 0
+
+Current subtree looks like:
+0:Humidity
+1:H
+2:Outlook
+      3:S
+         4:0
+      3:O
+         4:1
+      3:R
+      4:Wind
+            5:W
+               6:1
+            5:S
+               6:0
+1:N
+
+Call 1
+Labels [1, 0, 1, 1, 1, 1, 1]
+{'Outlook': ['R', 'R', 'O', 'S', 'R', 'S', 'O'],
+ 'Temperature': ['C', 'C', 'C', 'C', 'M', 'M', 'H'],
+ 'Wind': ['W', 'S', 'S', 'W', 'W', 'S', 'W']}
+
+The total purity of the system is: 0.143
+
+The gain for attribute Outlook is 0.000
+The gain for attribute Temperature is 0.000
+The gain for attribute Wind is 0.000
+
+Split on Outlook which has subsets of:
+{'O': {0: 0, 1: 2, 'filter': [2, 6]},
+ 'R': {0: 1, 1: 2, 'filter': [0, 1, 4]},
+ 'S': {0: 0, 1: 2, 'filter': [3, 5]}}
+
+Current subtree looks like:
+0:Outlook
+1:R
+
+Call 2
+Labels [1, 0, 1]
+{'Temperature': ['C', 'C', 'M'], 'Wind': ['W', 'S', 'W']}
+
+The total purity of the system is: 0.333
+
+The gain for attribute Temperature is 0.000
+The gain for attribute Wind is 0.333
+
+Split on Wind which has subsets of:
+{'S': {0: 1, 1: 0, 'filter': [1]}, 'W': {0: 0, 1: 2, 'filter': [0, 2]}}
+
+Current subtree looks like:
+0:Wind
+1:W
+
+Call 3
+Labels [1, 1]
+{'Temperature': ['C', 'M']}
+
+Pick label 1
+
+Current subtree looks like:
+0:Wind
+1:W
+   2:1
+1:S
+
+Call 3
+Labels [0]
+{'Temperature': ['C']}
+
+Pick label 0
+
+Current subtree looks like:
+0:Outlook
+1:R
+2:Wind
+      3:W
+         4:1
+      3:S
+         4:0
+1:O
+
+Call 2
+Labels [1, 1]
+{'Temperature': ['C', 'H'], 'Wind': ['S', 'W']}
+
+Pick label 1
+
+Current subtree looks like:
+0:Outlook
+1:R
+2:Wind
+      3:W
+         4:1
+      3:S
+         4:0
+1:O
+   2:1
+1:S
+
+Call 2
+Labels [1, 1]
+{'Temperature': ['C', 'M'], 'Wind': ['W', 'S']}
+
+Pick label 1
+
+Current subtree looks like:
+0:Humidity
+1:H
+2:Outlook
+      3:S
+         4:0
+      3:O
+         4:1
+      3:R
+      4:Wind
+            5:W
+               6:1
+            5:S
+               6:0
+1:N
+2:Outlook
+      3:R
+      4:Wind
+            5:W
+               6:1
+            5:S
+               6:0
+      3:O
+         4:1
+      3:S
+         4:1
+1:L
+
+Final tree looks like:
+0:Humidity
+1:H
+2:Outlook
+      3:S
+         4:0
+      3:O
+         4:1
+      3:R
+      4:Wind
+            5:W
+               6:1
+            5:S
+               6:0
+1:N
+2:Outlook
+      3:R
+      4:Wind
+            5:W
+               6:1
+            5:S
+               6:0
+      3:O
+         4:1
+      3:S
+         4:1
+1:L
+   2:1
+  
+ 1.2b --------------------------------------------------------------------------------------------------------------------------------------------
+Call 0
+Labels [0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0]
+{'Humidity': ['H',
+              'H',
+              'H',
+              'H',
+              'N',
+              'N',
+              'N',
+              'H',
+              'N',
+              'N',
+              'N',
+              'H',
+              'N',
+              'H'],
+ 'Outlook': ['S',
+             'S',
+             'O',
+             'R',
+             'R',
+             'R',
+             'O',
+             'S',
+             'S',
+             'R',
+             'S',
+             'O',
+             'O',
+             'R'],
+ 'Temperature': ['H',
+                 'H',
+                 'H',
+                 'M',
+                 'C',
+                 'C',
+                 'C',
+                 'M',
+                 'C',
+                 'M',
+                 'M',
+                 'M',
+                 'H',
+                 'M'],
+ 'Wind': ['W', 'S', 'W', 'W', 'W', 'S', 'S', 'W', 'W', 'W', 'S', 'S', 'W', 'S']}
+
+The total purity of the system is: 0.459
+
+The gain for attribute Outlook is 0.116
+The gain for attribute Temperature is 0.019
+The gain for attribute Humidity is 0.092
+The gain for attribute Wind is 0.031
+
+Split on Outlook which has subsets of:
+{'O': {0: 0, 1: 4, 'filter': [2, 6, 11, 12]},
+ 'R': {0: 2, 1: 3, 'filter': [3, 4, 5, 9, 13]},
+ 'S': {0: 3, 1: 2, 'filter': [0, 1, 7, 8, 10]}}
+
+Current subtree looks like:
+0:Outlook
+1:S
+
+Call 1
+Labels [0, 0, 0, 1, 1]
+{'Humidity': ['H', 'H', 'H', 'N', 'N'],
+ 'Temperature': ['H', 'H', 'M', 'C', 'M'],
+ 'Wind': ['W', 'S', 'W', 'W', 'S']}
+
+The total purity of the system is: 0.480
+
+The gain for attribute Temperature is 0.280
+The gain for attribute Humidity is 0.480
+The gain for attribute Wind is 0.013
+
+Split on Humidity which has subsets of:
+{'H': {0: 3, 1: 0, 'filter': [0, 1, 2]}, 'N': {0: 0, 1: 2, 'filter': [3, 4]}}
+
+Current subtree looks like:
+0:Humidity
+1:H
+
+Call 2
+Labels [0, 0, 0]
+{'Temperature': ['H', 'H', 'M'], 'Wind': ['W', 'S', 'W']}
+
+Pick label 0
+
+Current subtree looks like:
+0:Humidity
+1:H
+   2:0
+1:N
+
+Call 2
+Labels [1, 1]
+{'Temperature': ['C', 'M'], 'Wind': ['W', 'S']}
+
+Pick label 1
+
+Current subtree looks like:
+0:Humidity
+1:H
+   2:0
+1:N
+   2:1
+1:L
+
+Current subtree looks like:
+0:Outlook
+1:S
+2:Humidity
+      3:H
+         4:0
+      3:N
+         4:1
+      3:L
+         4:0
+1:O
+
+Call 1
+Labels [1, 1, 1, 1]
+{'Humidity': ['H', 'N', 'H', 'N'],
+ 'Temperature': ['H', 'C', 'M', 'H'],
+ 'Wind': ['W', 'S', 'S', 'W']}
+
+Pick label 1
+
+Current subtree looks like:
+0:Outlook
+1:S
+2:Humidity
+      3:H
+         4:0
+      3:N
+         4:1
+      3:L
+         4:0
+1:O
+   2:1
+1:R
+
+Call 1
+Labels [1, 1, 0, 1, 0]
+{'Humidity': ['H', 'N', 'N', 'N', 'H'],
+ 'Temperature': ['M', 'C', 'C', 'M', 'M'],
+ 'Wind': ['W', 'W', 'S', 'W', 'S']}
+
+The total purity of the system is: 0.480
+
+The gain for attribute Temperature is 0.013
+The gain for attribute Humidity is 0.013
+The gain for attribute Wind is 0.480
+
+Split on Wind which has subsets of:
+{'S': {0: 2, 1: 0, 'filter': [2, 4]}, 'W': {0: 0, 1: 3, 'filter': [0, 1, 3]}}
+
+Current subtree looks like:
+0:Wind
+1:W
+
+Call 2
+Labels [1, 1, 1]
+{'Humidity': ['H', 'N', 'N'], 'Temperature': ['M', 'C', 'M']}
+
+Pick label 1
+
+Current subtree looks like:
+0:Wind
+1:W
+   2:1
+1:S
+
+Call 2
+Labels [0, 0]
+{'Humidity': ['N', 'H'], 'Temperature': ['C', 'M']}
+
+Pick label 0
+
+Final tree looks like:
+0:Outlook
+1:S
+2:Humidity
+      3:H
+         4:0
+      3:N
+         4:1
+      3:L
+         4:0
+1:O
+   2:1
+1:R
+2:Wind
+      3:W
+         4:1
+      3:S
+         4:0
+1.2c answer on doc
+
+1.3a--------------------------------------------------------------------------------------------------------------------------------------------
+The total purity of the system is: 0.918
+
+The gain for attribute Outlook is 0.227
+The gain for attribute Temperature is 0.032
+The gain for attribute Humidity is 0.169
+The gain for attribute Wind is 0.060
+
+Split on Outlook which has subsets of:
+{'O': {0: 0, 1: 4, 'filter': [3, 7, 12, 13]},
+ 'R': {0: 2, 1: 4, 'filter': [0, 4, 5, 6, 10, 14]},
+ 'S': {0: 3, 1: 2, 'filter': [1, 2, 8, 9, 11]}}
+ 
+ Used R as the most common value
+ 1.3b --------------------------------------------------------------------------------------------------------------------------------------------
+ Used O as the instance with the same label
+ The total purity of the system is: 0.918
+
+The gain for attribute Outlook is 0.271
+The gain for attribute Temperature is 0.032
+The gain for attribute Humidity is 0.169
+The gain for attribute Wind is 0.060
+
+Split on Outlook which has subsets of:
+{'O': {0: 0, 1: 5, 'filter': [0, 3, 7, 12, 13]},
+ 'R': {0: 2, 1: 3, 'filter': [4, 5, 6, 10, 14]},
+ 'S': {0: 3, 1: 2, 'filter': [1, 2, 8, 9, 11]}}
+ 1.2c --------------------------------------------------------------------------------------------------------------------------------------------
+

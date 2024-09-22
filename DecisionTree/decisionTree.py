@@ -1,5 +1,6 @@
 from math import log2
 from math import inf
+import pprint
 
 # https://stackoverflow.com/a/28015122
 class Tree(object):
@@ -23,7 +24,7 @@ def count_labels(values):
     
     return total
 
-def create_subsets(attribute, labels):
+def create_subsets(attr_name, attribute, labels, attr_set):
     subsets = {}
     index = 0
 
@@ -36,6 +37,14 @@ def create_subsets(attribute, labels):
         subsets[item]["filter"].append(index)
         subsets[item][labels[index]] += 1
         index += 1
+    
+    for sub in subsets:
+        if sub not in attr_set[attr_name]:
+            index -= len(subsets[sub]["filter"])
+    
+    for sub in subsets:
+        if sub in attr_set[attr_name]:
+            subsets[sub]["proportion"] = len(subsets[sub]["filter"]) / index
 
     return subsets
 
@@ -50,6 +59,7 @@ def create_label(labels):
 
 def entropy(k_labels):
     k_labels.pop("filter", None)
+    k_labels.pop("proportion", None)
     values = k_labels.values()
     total = count_labels(values)
 
@@ -64,6 +74,7 @@ def entropy(k_labels):
 
 def ME(k_labels):
     k_labels.pop("filter", None)
+    k_labels.pop("proportion", None)
     values = k_labels.values()
     total = count_labels(values)
 
@@ -71,6 +82,7 @@ def ME(k_labels):
     
 def gini(k_labels):
     k_labels.pop("filter", None)
+    k_labels.pop("proportion", None)
     values = k_labels.values()
     total = count_labels(values)
 
@@ -80,42 +92,66 @@ def gini(k_labels):
     
     return (sum, total)
 
-def info_gain(purity, attribute, labels):
-    subsets = create_subsets(attribute, labels)
+def info_gain(purity, attribute, labels, func, a_s, attr_name):
+    subsets = create_subsets(attr_name, attribute, labels, a_s)
 
     gain = purity[0]
     total_labels = purity[1]
+
+    missing_labels = {}
+    bad_value = ''
+    for sub_v in subsets:
+        if sub_v not in a_s[attr_name]:
+            bad_value = sub_v
+            for label in subsets[sub_v]:
+                missing_labels[label] = subsets[sub_v][label]
+    subsets.pop(bad_value)
+    
+    for label in missing_labels:
+        if label != "filter":
+            for sub_v in subsets:
+                if missing_labels[label] != 0:
+                    subsets[sub_v][label] += missing_labels[label] * subsets[sub_v]["proportion"]
+
     for subset in subsets:
         subset_labels = subsets[subset]
         temp_sub = subsets[subset]['filter']
 
-        res = entropy(subset_labels)
+        res = func(subset_labels)
         gain -= (res[1] / total_labels) * res[0]
 
         subsets[subset]['filter'] = temp_sub
     
     return (gain, subsets)
 
-def split(attributes, labels, func=entropy):
+def split(attributes, labels, a_s, func=entropy):
     label_counts = create_label(labels)
 
     best_attribute = ''
     max_gain = -inf
     subsets_attribute = {}
+    e = func(label_counts)
+    print(f"The total purity of the system is: {e[0]:.3f}\n")
     for attribute in attributes:
-        res = info_gain(func(label_counts), attributes[attribute], labels)
+        res = info_gain(e, attributes[attribute], labels, func, a_s, attribute)
         gain = res[0]
-        # print(f"The gain for attribute {attribute} is {gain}")
+        print(f"The gain for attribute {attribute} is {gain:.3f}")
         subset = res[1]
         if gain > max_gain:
             best_attribute = attribute
             max_gain = gain
             subsets_attribute = subset
     
-    # print(f"Split on {best_attribute} which has subsets of {subsets_attribute}")
+    print(f"\nSplit on {best_attribute} which has subsets of:")
+    pprint.pprint(subsets_attribute)
+    print()
     return (best_attribute, subsets_attribute)
 
-def ID3(s, attributes):
+def ID3(s, attributes, attribute_set, call, func):
+    print(f'Call {call}')
+    print(f'Labels {pprint.pformat(s)}')
+    pprint.pprint(attributes)
+    print()
     labels = create_label(s)
     count = len(s)
 
@@ -124,21 +160,32 @@ def ID3(s, attributes):
     # If all examples have same labels return leaf node with label or most common label
     for l in labels:
         if labels[l] == count:
+            print(f"Pick label {l}\n")
             return Tree(l)
         if labels[l] > max_label:
             common_label = l
             max_label = labels[l]
     if len(attributes) == 0:
+        print(f"Pick label {common_label}\n")
         return Tree(common_label)
     
     #Else
-    A = split(attributes, s)
+    A = split(attributes, s, func)
     name = A[0]
     A_subset = A[1]
 
     root = Tree(name)
     
+    for pv in attribute_set[name]:
+        if pv not in A_subset:
+            A_subset[pv] = {"filter":[]}
+
     for v in A_subset:
+        v_node = Tree(v)
+        root.add_child(v_node)
+        print("Current subtree looks like:")
+        tree_traversal(root, 0, 0)
+        print()
         nl = []
         na = {}
         filter = A_subset[v]["filter"]
@@ -153,16 +200,27 @@ def ID3(s, attributes):
             nl.append(s[i])
         
         if len(nl) == 0:
-            root.add_child(Tree(common_label))
+            v_node.add_child(Tree(common_label))
         else:
-            root.add_child(ID3(nl, na))
-    
-    return root
-        
-def main():
-    l = [0,0,1,1,0,0,0]
-    a = {"x1":[0,0,0,1,0,1,0], "x2":[0,1,0,0,1,1,1], "x3":[1,0,1,0,1,0,0],"x4":[0,0,1,1,0,0,1]}
-    a = ID3(l, a)
+            v_node.add_child(ID3(nl, na, attribute_set,call + 1,func))
 
+    return root
+
+def tree_traversal(node, ident, level):
+    print(f'{str(level) + ":" + str(node.__repr__()):>{ident}}')
+    for c in node.children:
+        tree_traversal(c, ident + 3, level + 1)
+
+def main():
+    l = [1,0,0,1,1,1,0,1,0,1,1,1,1,1,0]
+    a = {"Outlook":["Missing","S", "S", "O", "R", "R", "R", "O", "S", "S", "R", "S", "O", "O", "R"],
+         "Temperature":["M","H", "H", "H", "M", "C", "C", "C", "M", "C", "M", "M", "M", "H", "M"],
+         "Humidity":["N","H", "H", "H", "H", "N", "N", "N", "H", "N", "N", "N", "H", "N", "H"],
+         "Wind":["W","W", "S", "W", "W", "W", "S", "S", "W", "W", "W", "S", "S", "W", "S"]}
+    a_s = {"Outlook": ["S", "O", "R"], "Temperature": ["H", "M", "C"], "Humidity":["H", "N", "L"], "Wind":["W", "S"]}
+    split(a, l, a_s)
+    # a= ID3(l, a, a_s, 0, gini)
+    # print("Final tree looks like:")
+    # tree_traversal(a, 0, 0)
 if __name__ == '__main__':
     main()
