@@ -105,7 +105,8 @@ def info_gain(purity, attribute, labels, func, a_s, attr_name):
             bad_value = sub_v
             for label in subsets[sub_v]:
                 missing_labels[label] = subsets[sub_v][label]
-    subsets.pop(bad_value)
+    if bad_value != '':
+        subsets.pop(bad_value)
     
     for label in missing_labels:
         if label != "filter":
@@ -147,7 +148,7 @@ def split(attributes, labels, a_s, func=entropy):
     print()
     return (best_attribute, subsets_attribute)
 
-def ID3(s, attributes, attribute_set, call, func):
+def ID3(s, attributes, attribute_set, call, func=entropy):
     print(f'Call {call}')
     print(f'Labels {pprint.pformat(s)}')
     pprint.pprint(attributes)
@@ -170,7 +171,7 @@ def ID3(s, attributes, attribute_set, call, func):
         return Tree(common_label)
     
     #Else
-    A = split(attributes, s, func)
+    A = split(attributes, s, attribute_set, func)
     name = A[0]
     A_subset = A[1]
 
@@ -218,9 +219,8 @@ def main():
          "Humidity":["N","H", "H", "H", "H", "N", "N", "N", "H", "N", "N", "N", "H", "N", "H"],
          "Wind":["W","W", "S", "W", "W", "W", "S", "S", "W", "W", "W", "S", "S", "W", "S"]}
     a_s = {"Outlook": ["S", "O", "R"], "Temperature": ["H", "M", "C"], "Humidity":["H", "N", "L"], "Wind":["W", "S"]}
-    split(a, l, a_s)
-    # a= ID3(l, a, a_s, 0, gini)
-    # print("Final tree looks like:")
-    # tree_traversal(a, 0, 0)
+    a= ID3(l, a, a_s, 0)
+    print("Final tree looks like:")
+    tree_traversal(a, 0, 0)
 if __name__ == '__main__':
     main()
