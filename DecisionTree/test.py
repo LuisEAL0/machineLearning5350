@@ -73,6 +73,7 @@ def test_car(data_dict, function):
 
 def most_common_label_replace(attributes, attribute_set):
     count_dict = {}
+    missing_values = {}
     for attr in attributes:
         if attribute_set[attr] == "numeric" or ("unknown" not in attribute_set[attr]):
             continue
@@ -90,9 +91,9 @@ def most_common_label_replace(attributes, attribute_set):
         if attr not in count_dict:
             continue
         replace = largest(count_dict, attr)
-        for i in range(len(attributes[attr])):
-            if attributes[attr][i] == "unknown":
-                attributes[attr][i] = replace
+        missing_values[attr] = replace
+
+    return missing_values
 
 def largest(count_dict, attr):        
     largest_val = ''
@@ -107,10 +108,10 @@ def largest(count_dict, attr):
 def test_bank(data_dict, function):
     labels = data_dict["label"]
     data_dict.pop("label")
-    attributes = data_dict
+    attributes = data_dict.copy()
     bank_attributes = {
     "age": "numeric",
-    "job": ["admin.", "unknown", "unemployed", "management", "housemaid", "entrepreneur", "student",
+    "job": ["unknown","admin.", "unemployed", "management", "housemaid", "entrepreneur", "student",
             "blue-collar", "self-employed", "retired", "technician", "services"],
     "marital": ["married", "divorced", "single"],
     "education": ["unknown", "secondary", "primary", "tertiary"],
@@ -118,7 +119,7 @@ def test_bank(data_dict, function):
     "balance": "numeric",
     "housing": ["yes", "no"],
     "loan": ["yes", "no"],
-    "contact": ["unknown", "telephone", "cellular"],
+    "contact": ["unknown","telephone", "cellular"],
     "day": "numeric",
     "month": ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"],
     "duration": "numeric",
@@ -129,7 +130,7 @@ def test_bank(data_dict, function):
     }
     bank_labels = ["yes", "no"]
 
-    most_common_label_replace(attributes, bank_attributes)
+    missing_values = most_common_label_replace(attributes, bank_attributes)
     median_dict = numerics(attributes, bank_attributes)
     for attr in bank_attributes:
         if bank_attributes[attr] == "numeric":
@@ -150,6 +151,8 @@ def test_bank(data_dict, function):
             for item in row:
                 if item in median_dict.keys():
                     row[item] = int(row[item])
+                if row[item] == "unknown":
+                    row[item] = missing_values[item]
             
             if row["label"] == predict(row, tree, bank_labels, median_dict):
                 correct += 1
@@ -161,6 +164,8 @@ def test_bank(data_dict, function):
             for item in row:
                 if item in median_dict.keys():
                     row[item] = int(row[item])
+                if row[item] == "unknown":
+                    row[item] = missing_values[item]
 
             if row["label"] == predict(row, tree, bank_labels, median_dict):
                 correct += 1
@@ -220,7 +225,7 @@ def avg(list):
 
 def main():
     gains = [entropy, gini, ME]
-    #run_tests(gains, "../DecisionTree/carData/train.csv", test_car)
+    run_tests(gains, "../DecisionTree/carData/train.csv", test_car)
     run_tests(gains, "../DecisionTree/bankData/train.csv", test_bank)
 
 if __name__ == '__main__':
