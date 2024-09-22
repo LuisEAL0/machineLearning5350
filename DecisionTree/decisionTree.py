@@ -135,27 +135,27 @@ def split(attributes, labels, a_s, func=entropy):
     max_gain = -inf
     subsets_attribute = {}
     e = func(label_counts)
-    print(f"The total purity of the system is: {e[0]:.3f}\n")
+    # print(f"The total purity of the system is: {e[0]:.3f}\n")
     for attribute in attributes:
         res = info_gain(e, attributes[attribute], labels, func, a_s, attribute)
         gain = res[0]
-        print(f"The gain for attribute {attribute} is {gain:.3f}")
+        # print(f"The gain for attribute {attribute} is {gain:.3f}")
         subset = res[1]
         if gain > max_gain:
             best_attribute = attribute
             max_gain = gain
             subsets_attribute = subset
     
-    print(f"\nSplit on {best_attribute} which has subsets of:")
-    pprint.pprint(subsets_attribute)
-    print()
+    # print(f"\nSplit on {best_attribute} which has subsets of:")
+    # pprint.pprint(subsets_attribute)
+    # print()
     return (best_attribute, subsets_attribute)
 
 def ID3(s, attributes, attribute_set, call, max_tree_depth, func=entropy, depth=0):
-    print(f'Call {call}')
-    print(f'Labels {pprint.pformat(s)}')
-    pprint.pprint(attributes)
-    print()
+    # print(f'Call {call}')
+    # print(f'Labels {pprint.pformat(s)}')
+    # pprint.pprint(attributes)
+    # print()
     labels = create_label(s)
     count = len(s)
 
@@ -164,13 +164,13 @@ def ID3(s, attributes, attribute_set, call, max_tree_depth, func=entropy, depth=
     # If all examples have same labels return leaf node with label or most common label
     for l in labels:
         if labels[l] == count:
-            print(f"Pick label {l}\n")
+            # print(f"Pick label {l}\n")
             return Tree(l, depth)
         if labels[l] > max_label:
             common_label = l
             max_label = labels[l]
     if len(attributes) == 0:
-        print(f"Pick label {common_label}\n")
+        # print(f"Pick label {common_label}\n")
         return Tree(common_label, depth)
     if depth >= max_tree_depth:
         return Tree(common_label, depth)
@@ -189,9 +189,9 @@ def ID3(s, attributes, attribute_set, call, max_tree_depth, func=entropy, depth=
     for v in A_subset:
         v_node = Tree(v, depth + 1)
         root.add_child(v_node)
-        print("Current subtree looks like:")
-        tree_traversal(root, 0)
-        print()
+        # print("Current subtree looks like:")
+        # tree_traversal(root, 0)
+        # print()
         nl = []
         na = {}
         filter = A_subset[v]["filter"]
@@ -215,7 +215,7 @@ def ID3(s, attributes, attribute_set, call, max_tree_depth, func=entropy, depth=
 def tree_traversal(node, ident):
     print(f'{str(node.level) + ":" + str(node.name):>{ident}}')
     for c in node.children:
-        tree_traversal(c, ident + 3)
+        tree_traversal(c, ident + 2)
 
 def main():
     # l = [1,0,0,1,1,1,0,1,0,1,1,1,1,1,0]
@@ -227,5 +227,6 @@ def main():
     # a= ID3(l, a, a_s, 0, 2)
     # print("Final tree looks like:")
     # tree_traversal(a, 0)
+    ...
 if __name__ == '__main__':
     main()
