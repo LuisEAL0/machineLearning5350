@@ -1,2 +1,3 @@
 #usr/bin/bash
-python3 test.py
+chmod +x run.sh
+./run.sh
