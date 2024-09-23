@@ -2,6 +2,11 @@ from math import log2
 from math import inf
 import pprint
 
+# Things to Do
+# 1. Use numpy and pandas
+# 2. Add documentation
+# 3. Refactor and clean up code
+
 # https://stackoverflow.com/a/28015122
 class Tree(object):
     "Generic tree node."
