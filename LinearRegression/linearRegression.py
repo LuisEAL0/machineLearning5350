@@ -1,5 +1,6 @@
 from math import inf
 from math import sqrt
+from random import randrange
 import csv
 
 class LinearRegression:
@@ -31,19 +32,31 @@ class LinearRegression:
         
         loss : integer
             total loss of the prediction
+        
+        lossEpochs : list
+            total loss of the prediction over epochs
+        
+        M : integer
+            Number of rows in data set
+        
+        N : integer
+            Number of columns in data set
         """
-        self.values = values
-        self.labels = labels
-        self.prediction = [0] * len(self.labels)
-        self.weight = [0] * (len(values[0]))
-        self.gradient = [0] * len(values[0])
-        self.loss = inf
+        self.M          = len(values)
+        self.N          = len(values[0])
+        self.values     = values
+        self.labels     = labels
+        self.prediction = [0] * self.M
+        self.weight     = [0] * self.N
+        self.gradient   = [0] * self.N
+        self.loss       = inf
+        self.lossEpochs = []
     
     def createPrediction(self):
         '''Creates a prediction vector using the self values and weight vectors'''
-        for i in range(len(self.values)):
+        for i in range(self.M):
             self.prediction[i] = 0
-            for j in range(len(self.weight)):
+            for j in range(self.N):
                 self.prediction[i] += self.values[i][j] * self.weight[j]
 
         return self.prediction
@@ -51,7 +64,7 @@ class LinearRegression:
     def updateLoss(self):
         '''Calculates the total loss of current prediction'''
         loss = 0
-        for i in range(len(self.labels)):
+        for i in range(self.M):
             loss += (self.labels[i] - self.prediction[i]) ** 2
         self.loss = .5 * loss
 
@@ -59,9 +72,9 @@ class LinearRegression:
 
     def updateGradient(self):
         '''Calculates gradient of the current prediction'''
-        for i in range(len(self.gradient)):
+        for i in range(self.N):
             self.gradient[i] = 0
-            for j in range(len(self.values)):
+            for j in range(self.M):
                 self.gradient[i] -= (self.labels[j] - self.prediction[j]) * self.values[j][i]
 
         return self.gradient
@@ -85,21 +98,72 @@ class LinearRegression:
         '''
         t = 0
         maxLoops = 1000000
-        epochWeight = [0] * len(self.weight)
-        weightDifference = [1] * len(self.weight)
+        epochWeight = [0] * self.N
+        weightDifference = [1] * self.N
         
         while(errorFunc(weightDifference) > (10 ** -6) or t > maxLoops):
-            self.createPrediction()
-            self.updateLoss()
             if self.loss > (10 ** 100):
                 print("No convergence... Pick different r")
                 break
 
             self.updateGradient()
-            for i in range(len(self.weight)):
-                epochWeight[i] = self.weight[i] - (r * self.gradient[i])
+            for i in range(self.N):
+                epochWeight[i]      = self.weight[i] - (r * self.gradient[i])
                 weightDifference[i] = epochWeight[i] - self.weight[i]
             self.weight = epochWeight.copy()
+            t += 1
+
+            self.createPrediction()
+            self.lossEpochs.append(self.updateLoss())
+
+        
+        return self.weight
+
+    def stochasticGradient(self, r, errorFunc):
+        '''
+        Stochastic Gradient Algorithm
+
+        If loss grows to large will return latest weight 
+        
+        Parameters
+        ----------
+        r : float
+            learning rate
+        errorFunc : function
+            function to calculate error between current and next weight
+        
+        Returns
+        -------
+        weight vector used to make predictions
+        '''
+        t = 0
+        maxLoops = 1000000
+        epochWeight = [0] * self.N
+        weightDifference = [1] * self.N
+        
+        while(errorFunc(weightDifference) > (10 ** -6) or t > maxLoops):
+            self.updateLoss()
+            if self.loss > (10 ** 100):
+                print("No convergence... Pick different r")
+                break
+
+            rand_i = randrange(0, self.M)
+            rand_x = self.values[rand_i]
+
+            self.prediction[rand_i] = 0
+            for j in range(self.N):
+                self.prediction[rand_i] += rand_x[j] * self.weight[j]
+
+            self.gradient = [0] * len(rand_x)
+            for j in range(self.N):
+                self.gradient[j] -= (self.labels[rand_i] - self.prediction[rand_i]) * rand_x[j]
+            
+            for i in range(self.N):
+                epochWeight[i]      = self.weight[i] - (r * self.gradient[i])
+                weightDifference[i] = epochWeight[i] - self.weight[i]
+            self.weight = epochWeight.copy()
+            
+            self.lossEpochs.append(self.updateLoss())
             t += 1
         
         return self.weight
@@ -144,22 +208,27 @@ def read_csv_line_prepend_bias(filepath, attributes : list):
     return [values, labels]
 
 def main():
-    traindata = read_csv_line_prepend_bias("./LinearRegression/concreteData/train.csv", ["Cement", "Slag", "Fly ash", "Water", "SP", "Coarse Aggr", "Fine Aggr", "Output"])
-    testdata = read_csv_line_prepend_bias("./LinearRegression/concreteData/test.csv", ["Cement", "Slag", "Fly ash", "Water", "SP", "Coarse Aggr", "Fine Aggr", "Output"])
+    traindata = read_csv_line_prepend_bias("../LinearRegression/concreteData/train.csv", ["Cement", "Slag", "Fly ash", "Water", "SP", "Coarse Aggr", "Fine Aggr", "Output"])
+    testdata  = read_csv_line_prepend_bias("../LinearRegression/concreteData/test.csv", ["Cement", "Slag", "Fly ash", "Water", "SP", "Coarse Aggr", "Fine Aggr", "Output"])
 
     lr = LinearRegression(traindata[0], traindata[1])
     test_lr = LinearRegression(testdata[0], testdata[1])
-    test_lr.weight = lr.batchGradient(.001, euclidNorm).copy()
+    test_lr.weight = lr.stochasticGradient(.0125, euclidNorm).copy()
 
-    # print(lr.createPrediction())
-    # print(lr.updateLoss())
-
-    print(test_lr.createPrediction())
-    print(test_lr.labels)
+    test_lr.createPrediction()
     print(test_lr.updateLoss())
+    lr.createPrediction()
+    print(lr.updateLoss())
 
-    # print(max(traindata[1]))
-    # print(min(traindata[1]))
+    sum = 0
+    for i in range(len(lr.prediction)):
+        sum += abs(lr.labels[i] - lr.prediction[i])
+    print(sum / len(lr.prediction))
+
+    sum = 0
+    for i in range(len(test_lr.prediction)):
+        sum += abs(test_lr.labels[i] - test_lr.prediction[i])
+    print(sum / len(test_lr.prediction))
 
 if __name__ == "__main__":
     main()
