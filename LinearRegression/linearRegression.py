@@ -1,8 +1,8 @@
-from math import inf
 from math import sqrt
 from random import randrange
 import numpy as np
 import csv
+import matplotlib.pyplot as mplot
 
 class LinearRegression:
     ''' Linear Regression model to make predictions based on given data '''
@@ -51,6 +51,7 @@ class LinearRegression:
         self.weight     = [0] * self.N
         self.gradient   = [0] * self.N
         self.loss       = 0
+        self.t          = 0
         self.lossEpochs = []
     
     def createPrediction(self):
@@ -97,12 +98,13 @@ class LinearRegression:
         -------
         weight vector used to make predictions
         '''
-        t = 0
-        maxLoops = 1000000
+        maxLoops = 10000
         epochWeight = [0] * self.N
         weightDifference = [1] * self.N
         
-        while(errorFunc(weightDifference) > (10 ** -6) or t > maxLoops):
+        while(errorFunc(weightDifference) > (10 ** -6) and self.t < maxLoops):
+            self.lossEpochs.append(self.updateLoss())
+            self.t += 1
             if self.loss > (10 ** 100):
                 print("No convergence... Pick different r")
                 break
@@ -113,9 +115,6 @@ class LinearRegression:
                 epochWeight[i]      = self.weight[i] - (r * self.gradient[i])
                 weightDifference[i] = epochWeight[i] - self.weight[i]
             self.weight = epochWeight.copy()
-            t += 1
-
-            self.lossEpochs.append(self.updateLoss())
         
         return self.weight
 
@@ -136,12 +135,13 @@ class LinearRegression:
         -------
         weight vector used to make predictions
         '''
-        t = 0
-        maxLoops = 1000000
+        maxLoops = 10000
         epochWeight = [0] * self.N
         weightDifference = [1] * self.N
         
-        while(errorFunc(weightDifference) > (10 ** -6) or t > maxLoops):
+        while(errorFunc(weightDifference) > (10 ** -6) and self.t < maxLoops):
+            self.lossEpochs.append(self.updateLoss())
+            self.t += 1
             if self.loss > (10 ** 100):
                 print("No convergence... Pick different r")
                 break
@@ -161,9 +161,6 @@ class LinearRegression:
                 epochWeight[i]      = self.weight[i] - (r * self.gradient[i])
                 weightDifference[i] = epochWeight[i] - self.weight[i]
             self.weight = epochWeight.copy()
-            t += 1
-
-            self.lossEpochs.append(self.updateLoss())
         
         return self.weight
     
@@ -212,8 +209,42 @@ def read_csv_line_prepend_bias(filepath, attributes : list):
     return [values, labels]
 
 def main():
-    traindata = read_csv_line_prepend_bias("./LinearRegression/concreteData/train.csv", ["Cement", "Slag", "Fly ash", "Water", "SP", "Coarse Aggr", "Fine Aggr", "Output"])
-    testdata  = read_csv_line_prepend_bias("./LinearRegression/concreteData/test.csv", ["Cement", "Slag", "Fly ash", "Water", "SP", "Coarse Aggr", "Fine Aggr", "Output"])
+    traindata = read_csv_line_prepend_bias("../LinearRegression/concreteData/train.csv", ["Cement", "Slag", "Fly ash", "Water", "SP", "Coarse Aggr", "Fine Aggr", "Output"])
+    testdata  = read_csv_line_prepend_bias("../LinearRegression/concreteData/test.csv", ["Cement", "Slag", "Fly ash", "Water", "SP", "Coarse Aggr", "Fine Aggr", "Output"])
+
+    # r = [1, .5, .25, .125, .05, 0.0125, .01, .001]
+    # t = []
+    # loss = []
+    # w = []
+
+    # for i in r:
+    #     lr = LinearRegression(traindata[0], traindata[1])
+    #     lr.batchGradient(i, euclidNorm)
+    #     loss.append(lr.lossEpochs)
+    #     w.append(lr.weight)
+    #     t.append(list(range(lr.t)))
+    
+    # for i in range(len(t)):
+    #     mplot.plot(t[i], loss[i])
+    #     mplot.xlabel("Epochs")
+    #     mplot.ylabel("Loss")
+    #     mplot.title("Learning Rate of " + str(r[i]))
+    #     print(f'r = {r[i]} | w = {w[i]}')
+    #     mplot.savefig("stepSize"+ str(i) + ".png", bbox_inches='tight')   
+    #     mplot.close()
+    
+    # print(loss[-1][-1])
+    # testlr = LinearRegression(testdata[0], testdata[1])
+    # print(testlr.updateLoss())
+    # testlr.weight = w[-1]
+    # testlr.createPrediction()
+    # print(testlr.updateLoss())
+
+    lr = LinearRegression(testdata[0], testdata[1])
+    lr.weight = [-0.015196667629658952, 0.9005645138795246, 0.7862933110469034, 0.8510431401616544, 1.2988941272044878, 0.12989067062873041, 1.572248873098126, 0.9986935879479917]
+    lr.createPrediction()
+    print(lr.updateLoss())
+    
 
 if __name__ == "__main__":
     main()
