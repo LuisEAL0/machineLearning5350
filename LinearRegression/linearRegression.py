@@ -1,6 +1,7 @@
 from math import inf
 from math import sqrt
 from random import randrange
+import numpy as np
 import csv
 
 class LinearRegression:
@@ -49,7 +50,7 @@ class LinearRegression:
         self.prediction = [0] * self.M
         self.weight     = [0] * self.N
         self.gradient   = [0] * self.N
-        self.loss       = inf
+        self.loss       = 0
         self.lossEpochs = []
     
     def createPrediction(self):
@@ -106,6 +107,7 @@ class LinearRegression:
                 print("No convergence... Pick different r")
                 break
 
+            self.createPrediction()
             self.updateGradient()
             for i in range(self.N):
                 epochWeight[i]      = self.weight[i] - (r * self.gradient[i])
@@ -113,9 +115,7 @@ class LinearRegression:
             self.weight = epochWeight.copy()
             t += 1
 
-            self.createPrediction()
             self.lossEpochs.append(self.updateLoss())
-
         
         return self.weight
 
@@ -142,7 +142,6 @@ class LinearRegression:
         weightDifference = [1] * self.N
         
         while(errorFunc(weightDifference) > (10 ** -6) or t > maxLoops):
-            self.updateLoss()
             if self.loss > (10 ** 100):
                 print("No convergence... Pick different r")
                 break
@@ -162,12 +161,16 @@ class LinearRegression:
                 epochWeight[i]      = self.weight[i] - (r * self.gradient[i])
                 weightDifference[i] = epochWeight[i] - self.weight[i]
             self.weight = epochWeight.copy()
-            
-            self.lossEpochs.append(self.updateLoss())
             t += 1
+
+            self.lossEpochs.append(self.updateLoss())
         
         return self.weight
-            
+    
+    def analyticalW(self):
+        xT = np.transpose(self.values)
+        return (np.linalg.inv(xT @ self.values) @ xT @ self.labels).tolist()
+
 def euclidNorm(vector):
     '''Calculates the Euclidean Norm of a vector'''
     norm = 0
@@ -208,27 +211,8 @@ def read_csv_line_prepend_bias(filepath, attributes : list):
     return [values, labels]
 
 def main():
-    traindata = read_csv_line_prepend_bias("../LinearRegression/concreteData/train.csv", ["Cement", "Slag", "Fly ash", "Water", "SP", "Coarse Aggr", "Fine Aggr", "Output"])
-    testdata  = read_csv_line_prepend_bias("../LinearRegression/concreteData/test.csv", ["Cement", "Slag", "Fly ash", "Water", "SP", "Coarse Aggr", "Fine Aggr", "Output"])
-
-    lr = LinearRegression(traindata[0], traindata[1])
-    test_lr = LinearRegression(testdata[0], testdata[1])
-    test_lr.weight = lr.stochasticGradient(.0125, euclidNorm).copy()
-
-    test_lr.createPrediction()
-    print(test_lr.updateLoss())
-    lr.createPrediction()
-    print(lr.updateLoss())
-
-    sum = 0
-    for i in range(len(lr.prediction)):
-        sum += abs(lr.labels[i] - lr.prediction[i])
-    print(sum / len(lr.prediction))
-
-    sum = 0
-    for i in range(len(test_lr.prediction)):
-        sum += abs(test_lr.labels[i] - test_lr.prediction[i])
-    print(sum / len(test_lr.prediction))
+    traindata = read_csv_line_prepend_bias("./LinearRegression/concreteData/train.csv", ["Cement", "Slag", "Fly ash", "Water", "SP", "Coarse Aggr", "Fine Aggr", "Output"])
+    testdata  = read_csv_line_prepend_bias("./LinearRegression/concreteData/test.csv", ["Cement", "Slag", "Fly ash", "Water", "SP", "Coarse Aggr", "Fine Aggr", "Output"])
 
 if __name__ == "__main__":
     main()
