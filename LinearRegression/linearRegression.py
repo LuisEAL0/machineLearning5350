@@ -168,6 +168,7 @@ class LinearRegression:
         return self.weight
     
     def analyticalW(self):
+        '''Analytically solves for weight vector with (X. X^T)^-1 . X^T . Y'''
         xT = np.transpose(self.values)
         return (np.linalg.inv(xT @ self.values) @ xT @ self.labels).tolist()
 
