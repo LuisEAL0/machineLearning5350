@@ -56,14 +56,14 @@ def test_car(data_dict, function):
         tree = ID3(labels, attributes, car_attributes, 0, tree_size, function)
 
         correct = 0
-        train_data = read_csv_line("../DecisionTree/carData/train.csv")
+        train_data = read_csv_line("../EnsembleLearning/carData/train.csv")
         for row in train_data:
             if row["label"] == predict(row, tree, car_labels):
                 correct += 1
         train_car.append(correct/total)
 
         correct = 0
-        test_data = read_csv_line("../DecisionTree/carData/test.csv")
+        test_data = read_csv_line("../EnsembleLearning/carData/test.csv")
         for row in test_data:
             if row["label"] == predict(row, tree, car_labels):
                 correct += 1
@@ -105,10 +105,9 @@ def largest(count_dict, attr):
             max_val = count_dict[attr][value]
     return largest_val
 
-def test_bank(data_dict, function):
+def bankData(data_dict):
     labels = data_dict["label"]
     data_dict.pop("label")
-    attributes = data_dict.copy()
     bank_attributes = {
     "age": "numeric",
     "job": ["unknown","admin.", "unemployed", "management", "housemaid", "entrepreneur", "student",
@@ -128,16 +127,19 @@ def test_bank(data_dict, function):
     "previous": "numeric",
     "poutcome": ["unknown", "other", "failure", "success"]
     }
+
     bank_labels = ["yes", "no"]
 
-    missing_values = most_common_label_replace(attributes, bank_attributes)
-    median_dict = numerics(attributes, bank_attributes)
+    median_dict = numerics(data_dict, bank_attributes)
     for attr in bank_attributes:
         if bank_attributes[attr] == "numeric":
             bank_attributes[attr] = ["less", "greater"]
-            for i in range(len(attributes[attr])):
-                attributes[attr][i] = int(attributes[attr][i])
-    
+            for i in range(len(data_dict[attr])):
+                data_dict[attr][i] = int(data_dict[attr][i])
+
+    return {"labels": labels, "values": data_dict, "medians":median_dict ,"attributeNames": bank_attributes, "labelNames": bank_labels}
+
+def test_bank(function):
     test_bank = []
     train_bank = []
     total = len(labels)
@@ -146,32 +148,33 @@ def test_bank(data_dict, function):
         tree = ID3(labels, attributes, bank_attributes, 0, tree_size, function)
 
         correct = 0
-        train_data = read_csv_line("../DecisionTree/bankData/train.csv")
+        train_data = read_csv_line("../EnsembleLearning/bankData/train.csv")
         for row in train_data:
             for item in row:
                 if item in median_dict.keys():
                     row[item] = int(row[item])
-                if row[item] == "unknown":
-                    row[item] = missing_values[item]
+                # if row[item] == "unknown":
+                #     row[item] = missing_values[item]
             
             if row["label"] == predict(row, tree, bank_labels, median_dict):
                 correct += 1
         train_bank.append(correct/total)
 
         correct = 0
-        test_data = read_csv_line("../DecisionTree/bankData/test.csv")
+        test_data = read_csv_line("../EnsembleLearning/bankData/test.csv")
         for row in test_data:
             for item in row:
                 if item in median_dict.keys():
                     row[item] = int(row[item])
-                if row[item] == "unknown":
-                    row[item] = missing_values[item]
+                # if row[item] == "unknown":
+                #     row[item] = missing_values[item]
 
             if row["label"] == predict(row, tree, bank_labels, median_dict):
                 correct += 1
         test_bank.append(correct/total)
     
     return (train_bank, test_bank)
+    ...
              
 def predict(example, tree, labels, median={}):
     if tree.branch:
@@ -225,10 +228,10 @@ def avg(list):
 
 def main():
     gains = [entropy, gini, ME]
-    print("Running Decision Tree on carData...")
-    run_tests(gains, "../DecisionTree/carData/train.csv", test_car)
-    print("\nRunning Decision Tree on bankData...")
-    run_tests(gains, "../DecisionTree/bankData/train.csv", test_bank)
+    # print("Running Decision Tree on carData...")
+    # run_tests(gains, "../DecisionTree/carData/train.csv", test_car)
+    # print("\nRunning Decision Tree on bankData...")
+    # run_tests(gains, "../DecisionTree/bankData/train.csv", test_bank)
 
 if __name__ == '__main__':
     main()

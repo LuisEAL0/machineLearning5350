@@ -1,3 +1,4 @@
+age,job,marital,education,default,balance,housing,loan,contact,day,month,duration,campaign,pdays,previous,poutcome,label
 41,management,single,secondary,no,764,no,no,cellular,12,jun,230,2,-1,0,unknown,no
 39,blue-collar,married,secondary,no,49,yes,no,cellular,14,may,566,1,370,2,failure,no
 60,retired,married,primary,no,0,no,no,telephone,30,jul,130,3,-1,0,unknown,no

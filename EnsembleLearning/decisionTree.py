@@ -191,7 +191,7 @@ def split(attributes, labels, a_s, func=entropy, randomForest=False, randomFores
         for attribute in attributes:
             attributeSet.append(attribute)
             size += 1
-        for _ in range(randomForest):
+        for _ in range(randomForestSize):
             rand_i = randrange(0, size)
             randomForestSet[attributeSet[rand_i]] = attributes[attributeSet[rand_i]]
         splitAttributes = randomForestSet
