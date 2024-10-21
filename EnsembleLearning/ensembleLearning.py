@@ -50,8 +50,8 @@ class EnsembleLearning():
         '''TODO'''
         t = 0
         self.familyOfTrees = [None] * numberOfTrees
+        examplesSize = int(m * self.N)
         while t < numberOfTrees:
-            examplesSize = int(m * self.N)
             examples = {}
             for attribute in self.examples.keys():
                 if attribute not in examples:
@@ -94,8 +94,6 @@ class EnsembleLearning():
 
 def main():
     data = bankData(read_csv_asdict("../EnsembleLearning/bankData/train.csv"))
-    # baggers = EnsembleLearning(data["values"], data["labels"], data["attributeNames"], data["labelNames"], data["medians"],ID3)
-    # baggers.forest(.20, 2, 2)
 
     test_bank = []
     train_bank = []
@@ -104,7 +102,7 @@ def main():
     test_data = read_csv_line("../EnsembleLearning/bankData/test.csv")
 
     baggers = EnsembleLearning(data["values"], data["labels"], data["attributeNames"], data["labelNames"], data["medians"],ID3)
-    baggers.forest(.20, 500, 6)
+    baggers.bagged(.20, 500)
 
     for i in range(500):
         if i % 10 == 0:
@@ -134,8 +132,8 @@ def main():
                 correct += 1
         test_bank.append(correct/total)
     
-    print(train_bank)
-    print(test_bank)
+    print(train_bank[:20])
+    print(test_bank[:20])
 
 if __name__ == "__main__":
     main()
