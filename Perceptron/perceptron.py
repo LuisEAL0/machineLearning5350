@@ -27,7 +27,7 @@ class Perceptron:
             learning rate
         
         Internals
-        ----
+        ---------
         prediction : list
             prediction using learned weight vector
         
@@ -297,8 +297,8 @@ def average_perceptron_test(values, labels, test_values, test_labels):
     print(f'The error rate is: {((1 - (correct_predictions/total_examples)) * 100):.2f}%\n')
 
 def main():
-    traindata = read_csv_line_prepend_bias("Perceptron/bank-note/train.csv", [0,1,2,3,4])
-    testdata  = read_csv_line_prepend_bias("Perceptron/bank-note/test.csv", [0,1,2,3,4])
+    traindata = read_csv_line_prepend_bias("./bank-note/train.csv", [0,1,2,3,4])
+    testdata  = read_csv_line_prepend_bias("./bank-note/test.csv", [0,1,2,3,4])
 
     standard_perceptron_test(traindata[0], traindata[1], testdata[0], testdata[1])
     voted_perceptron_test(traindata[0], traindata[1], testdata[0], testdata[1])
