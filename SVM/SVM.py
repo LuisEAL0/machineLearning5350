@@ -203,11 +203,15 @@ def read_csv_line_prepend_bias(filepath, attributes : list):
 
     return (values, labels)
 
-
-def SVMTest(values, labels, test_values, test_labels, C, r, epochs):
+def SVMTest(values, labels, test_values, test_labels, C, r, epochs, step_size_func=step_size_func1):
     print("RUNNING Stochastic Sub Gradient Descent...")
     print("TRAIN DATA")
-    perceptron = SVM(values, labels, SVM.stochastic_sub_gradient_descent, epochs, C, r, step_size_func1)
+    print(f'Number of examples: {len(labels)}')
+    print(f'Number of attributes: {len(values[0])}')
+    print(f'Number of epochs: {epochs}')
+    print(f'C: {C}')
+    print(f'r: {r}\n')
+    perceptron = SVM(values, labels, SVM.stochastic_sub_gradient_descent, epochs, C, r, step_size_func)
     print(f'Learned weight vector is : {perceptron.weight}')
 
     total_examples = len(labels)
@@ -230,7 +234,17 @@ def main():
     traindata = read_csv_line_prepend_bias("./bank-note/train.csv", [0,1,2,3,4])
     testdata  = read_csv_line_prepend_bias("./bank-note/test.csv", [0,1,2,3,4])
 
-    SVMTest(traindata[0], traindata[1], testdata[0], testdata[1], 1, 0.01, 100)
+    print("RUNNING Stochastic Sub Gradient Descent with step size function 1...")
+    SVMTest(traindata[0], traindata[1], testdata[0], testdata[1], (100/873), 1, 100)
+    SVMTest(traindata[0], traindata[1], testdata[0], testdata[1], (500/873), 1, 100)
+    SVMTest(traindata[0], traindata[1], testdata[0], testdata[1], (700/873), 1, 100)
+
+    print("\n\n")
+    print("RUNNING Stochastic Sub Gradient Descent with step size function 2...")
+    SVMTest(traindata[0], traindata[1], testdata[0], testdata[1], (100/873), 1, 100, step_size_func2)
+    SVMTest(traindata[0], traindata[1], testdata[0], testdata[1], (500/873), 1, 100, step_size_func2)
+    SVMTest(traindata[0], traindata[1], testdata[0], testdata[1], (700/873), 1, 100, step_size_func2)
+
 
 if __name__ == '__main__':
     main()
