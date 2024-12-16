@@ -3,15 +3,14 @@ import random
 import math
 
 class NeuralNetwork:
-    def __init__(self, values: list, labels: list, epochs: int):
+    def __init__(self, values: list, label: list, epochs: int, weights=None):
         self.values = values
         self.labels = labels
         self.epochs = epochs
-        # self.M = len(values)
         self.N = len(values)
         self.root = NeuralNode(0, 0, [], [])
         self.inputs = []
-        self.build_neural_net()
+        self.build_neural_net(weights)
         self.weights = self.stochastic_gradient_descent()
     
     def stochastic_gradient_descent(self):
@@ -24,21 +23,27 @@ class NeuralNetwork:
         
         return weight
     
-    def build_neural_net(self, layers=2):
+    def build_neural_net(self, weights, layers=2):
         '''
         Builds the Neural Network.
         '''
         # Initialize the root node
-        for _ in range(self.N):
-            self.root.add_child(NeuralNode(0, 0, [self.root], []))
+        for i in range(self.N):
+            child = NeuralNode(0, 0, [], [])
+            if i == 0:
+                child.value = 1
+            child.add_parent(self.root, random.random() if weights is None else weights.pop(0))
+            self.root.add_child(child)
         
         # Initialize the hidden layers
         current = self.root
         for _ in range(layers):
-            for _ in range(self.N):
+            for i in range(self.N):
                 child = NeuralNode(0, 0, [], [])
+                if i == 0:
+                    child.value = 1
                 for j in range(1, self.N):
-                    child.add_parent(current.children[j])
+                    child.add_parent(current.children[j], random.random() if weights is None else weights.pop(0))
                     current.children[j].add_child(child)
             current = current.children[len(current.children) // 2]
         self.inputs = current.children
@@ -58,16 +63,32 @@ class NeuralNetwork:
                     queue.insert(0, current.children[0])
                     queue.insert(1, current)
                     continue
+            if current.children != [] and current is not self.root:
+                current.value = self.sigmoid(current.value)
             for i in range(len(current.parents)):
                 parent = current.parents[i]
                 parent.value += current.value * current.parent_weights[i]
                 if parent not in queue:
                     queue.append(parent)
-            if current.children != []:
-                current.value = self.sigmoid(current.value)
             current.visited = True
         
         return self.root.value
+    
+    def back_propagation(self):
+        '''
+        Back propagation algorithm for Neural Networks.
+        '''
+        self.root.d_value = self.root.value - self.label[0]
+        queue = self.root
+        while queue != []:
+            current = queue.pop(0)
+            for i in range(len(current.children)):
+                child = current.children[i]
+                child.calculate_derivative()
+                child.d_value += current.d_value * current.children_weights[i]
+                if child not in queue:
+                    queue.append(child)
+            current.visited = True
     
     def sigmoid(self, x):
         return 1 / (1 + math.exp(-x))
@@ -95,9 +116,10 @@ class NeuralNode:
     __init__(self, value, d_value, parents, children):
         Initializes a NeuralNode with the given value, derivative value, parents, and children.
     """
-    def __init__(self, value, d_value, parents: list[NeuralNetwork], children: list[NeuralNetwork]):
+    def __init__(self, value, d_value, index, parents: list[NeuralNetwork], children: list[NeuralNetwork]):
         self.value = value
         self.d_value = d_value
+        self.index = index
         self.parents = parents
         self.parent_weights = [0] * len(parents)
         self.children = children
@@ -154,7 +176,15 @@ class NeuralNode:
         weight : float
             The weight to update the child node with.
         """
-        self.children_weights[index] = weight  
+        self.children_weights[index] = weight
+
+    def calculate_derivative(self):
+        """
+        Calculates the derivative of the value of the node.
+        """
+        for i in range(len(self.parents)):
+            self.d_value += self.parents[i].d_value * self.parent_weights[i]
+          
 
 def read_csv_line_prepend_bias(filepath, attributes : list):
     '''
@@ -196,8 +226,8 @@ def main():
     # print("RUNNING Stochastic Gradient Descent NN...")
 
     # print("RUNNING Stochastic Gradient Descent NN...")
-    nn = NeuralNetwork([1,1,1], [0], 100)
-    nn.forward_propagation()
+    nn = NeuralNetwork([1,1,1], [1], 100, [-1, 2, -1.5, -1, 1, -2, 2, -3, 3, -1, 1, -2, 2, -3, 3])
+    value = nn.forward_propagation()
     print("DONE")
 if __name__ == '__main__':
     main()
